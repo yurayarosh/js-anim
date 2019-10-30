@@ -1,9 +1,9 @@
-# animjs
+# js-anim
 
 ### Install
 
 ```html
-npm i animjs
+npm i js-anim
 ```
 
 ```html
@@ -13,7 +13,7 @@ npm i animjs
 ```
 
 ```js
-import Anim from 'animjs'
+import Anim from 'js-anim'
 
 const els = [...document.querySelectorAll('.js-anim-el')];
 if (!els.length) return;

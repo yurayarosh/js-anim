@@ -1,5 +1,5 @@
 {
-  "name": "animjs",
+  "name": "js-anim",
   "description": "Small JS plugin to handle popup",
   "version": "1.0.0",
   "scripts": {
@@ -9,7 +9,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yurayarosh/animjs"
+    "url": "https://github.com/yurayarosh/js-anim"
   },
   "keywords": [
     "anim",
@@ -19,7 +19,7 @@
   "authors": "yurayarosh",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/yurayarosh/animjs/issues"
+    "url": "https://github.com/yurayarosh/js-anim/issues"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
