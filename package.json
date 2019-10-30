@@ -1,0 +1,32 @@
+{
+  "name": "anim-js",
+  "description": "Small JS plugin to handle popup",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "rollup -c -w",
+    "build": "rollup -c"
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yurayarosh/anim-js"
+  },
+  "keywords": [
+    "anim",
+    "scroll",
+    "intersectionobserver"
+  ],
+  "authors": "yurayarosh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yurayarosh/anim-js/issues"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-preset-es2015-rollup": "^3.0.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-uglify": "^6.0.2"
+  },
+  "dependencies": {}
+}
