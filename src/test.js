@@ -5,22 +5,23 @@ class Animator extends Anim {
     super(el, options)
   }
 
-  onEnter() {
-    console.log(this, 'enter');
+  onEnter(animator) {
+    console.log(this, animator, 'enter');
   }
 
-  onComplete() {
-    console.log(this, 'complete');
-  }
+  // onComplete(animator) {
+  //   console.log(animator, 'complete');
+  // }
 }
 
 const els = [...document.querySelectorAll('.js-anim-el')];
   // if (!els.length) return;
 
-  els.forEach((el) => {
-    const animator = new Animator(el);
+  // els.forEach((el) => {
+    const animator = new Animator(els);
     animator.observe();
-    console.log(animator, 'init');
+    
+    // console.log(animator, 'init');
     
 
     // setTimeout(() => {
@@ -28,8 +29,8 @@ const els = [...document.querySelectorAll('.js-anim-el')];
 
     //   console.log(animator, 'destroy');
       
-    // }, 3000)
-  });
+    // }, 2000)
+  // });
 
 
 

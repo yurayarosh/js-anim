@@ -118,6 +118,10 @@ function _possibleConstructorReturn(self, call) {
   return _assertThisInitialized(self);
 }
 
+function _slicedToArray(arr, i) {
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+}
+
 function _toConsumableArray(arr) {
   return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
 }
@@ -130,12 +134,46 @@ function _arrayWithoutHoles(arr) {
   }
 }
 
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
 function _iterableToArray(iter) {
   if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
 }
 
+function _iterableToArrayLimit(arr, i) {
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+  var _e = undefined;
+
+  try {
+    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
 function _nonIterableSpread() {
   throw new TypeError("Invalid attempt to spread non-iterable instance");
+}
+
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance");
 }
 
 var defaultParameters = {
@@ -143,23 +181,24 @@ var defaultParameters = {
   infinite: false
 };
 
-var Anim =
+var Animator =
 /*#__PURE__*/
 function () {
-  function Anim(el, options) {
-    _classCallCheck(this, Anim);
+  function Animator(el, options) {
+    _classCallCheck(this, Animator);
 
     this.el = el;
-    this.options = _objectSpread2({}, defaultParameters, {}, options);
+    this.options = options;
     this.iteration = 0;
     this.duration = 1000;
     this.state = {
       enter: false,
-      animating: false
+      animating: false,
+      unobserved: false
     };
   }
 
-  _createClass(Anim, [{
+  _createClass(Animator, [{
     key: "getAnimationOptions",
     value: function getAnimationOptions() {
       this.animationDuration = this.el.getAttribute('data-anim-duration') || '1s';
@@ -186,82 +225,121 @@ function () {
       this.el.style.animationDuration = '';
       this.el.style.animationTimingFunction = '';
     }
-  }, {
+  }], [{
     key: "animateEls",
     value: function animateEls(entries, observer) {
       var _this = this;
 
-      entries.forEach(function (entry) {
-        _this.animationName = _this.el.getAttribute('data-anim-name');
-        if (!_this.animationName) return;
+      entries.forEach(function (entry, i) {
+        var el = entry.target;
+        var animator;
 
-        _this.getAnimationOptions();
+        if (_this.animators.length < entries.length) {
+          animator = new Animator(el, _this.options);
 
-        if (!_this.state.enter) {
-          _this.hideElement();
+          _this.animators.push(animator);
+        } else {
+          var _this$animators$filte = _this.animators.filter(function (obj) {
+            return obj.el === el;
+          });
+
+          var _this$animators$filte2 = _slicedToArray(_this$animators$filte, 1);
+
+          animator = _this$animators$filte2[0];
         }
 
-        if (entry.isIntersecting && !_this.state.animating) {
-          _this.state.enter = true;
-          _this.state.animating = true;
-          _this.iteration += 1;
-          _this.duration = 1000 * (+_this.animationDuration.slice(0, -1) + +_this.animationDelay.slice(0, -1));
-          _this.delay = 1000 * +_this.animationDelay.slice(0, -1);
-          setTimeout(function () {
-            _this.showElement();
-          }, _this.delay);
-          setTimeout(function () {
-            _this.state.animating = false;
+        animator.animationName = el.getAttribute('data-anim-name');
+        if (!animator.animationName) return;
+        animator.getAnimationOptions();
 
-            if (_this.iteration >= _this.animationIterations && !_this.options.infinite) {
-              if (_this.onComplete) _this.onComplete();
-              observer.unobserve(_this.el);
+        if (!animator.state.enter) {
+          animator.hideElement();
+        }
 
-              _this.showElement();
+        if (entry.isIntersecting && !animator.state.animating) {
+          animator.state.enter = true;
+          animator.state.animating = true;
+          animator.iteration += 1;
+          animator.duration = 1000 * (+animator.animationDuration.slice(0, -1) + +animator.animationDelay.slice(0, -1));
+          animator.delay = 1000 * +animator.animationDelay.slice(0, -1);
+          setTimeout(function () {
+            animator.showElement();
+          }, animator.delay);
+          setTimeout(function () {
+            animator.state.animating = false;
+
+            if (animator.iteration >= animator.animationIterations && !animator.options.infinite) {
+              if (_this.onComplete) _this.onComplete(animator);
+              observer.unobserve(animator.el);
+              animator.showElement();
+              animator.state.unobserved = true;
             }
-          }, _this.duration);
-          if (_this.onEnter) _this.onEnter();
+          }, animator.duration);
+          if (_this.onEnter) _this.onEnter(animator);
         } else {
-          if (_this.animationIterations > 0 && !_this.state.animating || _this.options.infinite && !_this.state.animating || !_this.state.animating && !_this.state.enter) {
-            _this.hideElement();
-          } // if (this.onExit
-          //   && this.state.enter
-          //   // && !el.classList.contains(IS_ANIMATING)
-          // ) {
-          //   this.onExit();
-          // }
+          if (animator.animationIterations > 0 && !animator.state.animating || animator.options.infinite && !animator.state.animating || !animator.state.animating && !animator.state.enter) {
+            animator.hideElement();
+          }
 
-
-          if (_this.options.infinite) {
-            _this.state.enter = false;
-          } else if (!_this.state.animating) {
-            _this.state.enter = false;
+          if (animator.options.infinite) {
+            animator.state.enter = false;
+          } else if (!animator.state.animating) {
+            animator.state.enter = false;
           } else {
             setTimeout(function () {
-              _this.state.enter = false;
-            }, _this.duration);
+              animator.state.enter = false;
+              if (!animator.state.unobserved) animator.hideElement();
+            }, animator.duration);
           }
         }
       });
     }
-  }, {
+  }]);
+
+  return Animator;
+}();
+
+var Anim =
+/*#__PURE__*/
+function () {
+  function Anim(els, options) {
+    _classCallCheck(this, Anim);
+
+    this.els = els;
+    this.options = _objectSpread2({}, defaultParameters, {}, options);
+    this.animate = Animator.animateEls;
+    this.animators = [];
+  }
+
+  _createClass(Anim, [{
     key: "observe",
     value: function observe() {
-      this.observer = new IntersectionObserver(this.animateEls.bind(this), this.options.observer);
-      this.observer.observe(this.el);
+      var _this2 = this;
+
+      if (!this.els.length) return;
+      this.observer = new IntersectionObserver(this.animate.bind(this), this.options.observer);
+      this.els.forEach(function (el) {
+        _this2.observer.observe(el);
+      });
     }
   }, {
     key: "unobserve",
     value: function unobserve() {
-      this.observer.unobserve(this.el);
-      this.showElement();
+      var _this3 = this;
+
+      this.els.forEach(function (el, i) {
+        _this3.observer.unobserve(el);
+
+        if (_this3.animators.length > 0) _this3.animators[i].showElement();
+      });
+      this.animators = [];
     }
   }]);
 
   return Anim;
 }();
 
-var Animator =
+var Animator$1 =
 /*#__PURE__*/
 function (_Anim) {
   _inherits(Animator, _Anim);
@@ -274,27 +352,25 @@ function (_Anim) {
 
   _createClass(Animator, [{
     key: "onEnter",
-    value: function onEnter() {
-      console.log(this, 'enter');
-    }
-  }, {
-    key: "onComplete",
-    value: function onComplete() {
-      console.log(this, 'complete');
-    }
+    value: function onEnter(animator) {
+      console.log(this, animator, 'enter');
+    } // onComplete(animator) {
+    //   console.log(animator, 'complete');
+    // }
+
   }]);
 
   return Animator;
 }(Anim);
 
 var els = _toConsumableArray(document.querySelectorAll('.js-anim-el')); // if (!els.length) return;
+// els.forEach((el) => {
 
 
-els.forEach(function (el) {
-  var animator = new Animator(el);
-  animator.observe();
-  console.log(animator, 'init'); // setTimeout(() => {
-  //   animator.unobserve();
-  //   console.log(animator, 'destroy');
-  // }, 3000)
-});
+var animator = new Animator$1(els);
+animator.observe(); // console.log(animator, 'init');
+// setTimeout(() => {
+//   animator.unobserve();
+//   console.log(animator, 'destroy');
+// }, 2000)
+// });

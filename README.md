@@ -18,10 +18,8 @@ import Anim from 'js-anim'
 const els = [...document.querySelectorAll('.js-anim-el')];
 if (!els.length) return;
 
-els.forEach((el) => {
-  const animator = new Anim(el);
-  animator.observe();
-});
+const anim = new Anim(el);
+anim.observe();
 ```
 
 ### Options
@@ -37,11 +35,11 @@ Standart options
 ### Methods
 
 ```js
-animator.onEnter = () => {
+anim.onEnter = (animator) => {
   // some callback
 };
-animator.onComplete = () => {
+anim.onComplete = (animator) => {
   // some callback
 };
-animator.unobserve();
+anim.unobserve();
 ```
