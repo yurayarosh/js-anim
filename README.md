@@ -40,4 +40,7 @@ Standart options
 animator.onEnter = () => {
   // some callback
 };
+animator.onComplete = () => {
+  // some callback
+};
 ```
