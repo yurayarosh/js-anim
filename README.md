@@ -7,7 +7,7 @@ npm i js-anim
 ```
 
 ```html
-<div class="box js-anim-el" data-anim-name="slideRight" data-anim-iterations="4" data-anim-ease="cubic-bezier(0.19, 1, 0.22, 1)">
+<div class="box js-anim-el" data-anim-name="slideRight" data-anim-iterations="4" data-anim-delay="1s" data-anim-ease="cubic-bezier(0.19, 1, 0.22, 1)">
     
 </div>
 ```

@@ -26,7 +26,9 @@ export default class Anim {
     this.el.style.visibility = 'visible';
     this.el.classList.add(this.animationName);
     this.el.style.animationDuration = this.animationDuration;
-    this.el.style.animationTimingFunction = this.animationTimingFunction;
+    if (this.animationTimingFunction !== 'ease') {
+      this.el.style.animationTimingFunction = this.animationTimingFunction;
+    }
   }
 
   hideElement() {
