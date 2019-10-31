@@ -8,11 +8,28 @@
     body {
       height: 2000px;
     }
+
+    .box {
+      margin-top: 150vh;
+      width: 500px;
+      height: 500px;
+      background-color: orange;
+    }
+
+    .slideRight {
+      animation-name: slideRight;
+    }
+
+    @keyframes slideRight {
+      from { transform: translate(-100%, 0); }
+      to { transform: translate(0, 0) }
+      }
+
   </style>
 </head>
 <body>  
 
-  <div class="js-anim-el" data-anim-name="fadeIn" data-anim-iterations="4">
+  <div class="box js-anim-el" data-anim-name="slideRight" data-anim-iterations="4" data-anim-ease="cubic-bezier(0.19, 1, 0.22, 1)">
     hello
   </div>
   

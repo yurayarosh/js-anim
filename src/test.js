@@ -8,6 +8,10 @@ class Animator extends Anim {
   onEnter() {
     console.log(this, 'enter');
   }
+
+  onComplete() {
+    console.log(this, 'complete');
+  }
 }
 
 const els = [...document.querySelectorAll('.js-anim-el')];

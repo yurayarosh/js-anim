@@ -7,7 +7,7 @@ export default class Anim {
   constructor(el, options) {
     this.el = el;
     this.options = { ...defaultParameters, ...options };
-    this.iteration = 1;
+    this.iteration = 0;
     this.delay = 1000;
     this.state = {
       enter: false,
@@ -19,59 +19,67 @@ export default class Anim {
     this.animate();
   }
 
+  getAnimationOptions() {
+    this.animationDuration = this.el.getAttribute('data-anim-duration') || '1s';
+    this.animationDelay = this.el.getAttribute('data-anim-delay') || '0s';
+    this.animationIterations = +this.el.getAttribute('data-anim-iterations') || 1;
+    this.animationTimingFunction = this.el.getAttribute('data-anim-ease') || 'ease';
+  }
+
+  showElement() {
+    this.el.style.visibility = 'visible';
+    this.el.classList.add(this.animationName);
+    this.el.style.animationDuration = this.animationDuration;
+    this.el.style.animationDelay = this.animationDelay;
+    this.el.style.animationTimingFunction = this.animationTimingFunction;
+  }
+
+  hideElement() {
+    this.el.style.visibility = 'hidden';
+    this.el.classList.remove(this.animationName);
+    this.el.style.animationDuration = '';
+    this.el.style.animationDelay = '';
+    this.el.style.animationTimingFunction = '';
+  }
+
   animateEls(entries, observer) {
     entries.forEach((entry) => {
-      const el = entry.target;
-
-      this.animationName = el.getAttribute('data-anim-name');
+      this.animationName = this.el.getAttribute('data-anim-name');
       if (!this.animationName) return;
-
-      this.animationDuration = el.getAttribute('data-anim-duration') || '1s';
-      this.animationDelay = el.getAttribute('data-anim-delay') || '0s';
-      this.animationIterations = +el.getAttribute('data-anim-iterations');
+      this.getAnimationOptions();
 
       if (!this.state.enter) {
-        el.style.opacity = '0';
+        this.hideElement();
       }
 
       if (entry.isIntersecting && !this.state.animating) {
         this.state.enter = true;
         this.state.animating = true;
+        this.iteration += 1;
 
-        el.classList.add(this.animationName);
-        el.style.animationDuration = this.animationDuration;
-        el.style.animationDelay = this.animationDelay;
+        this.showElement()
 
         this.delay = 1000
          * ((+this.animationDuration.slice(0, -1))
           + (+this.animationDelay.slice(0, -1)));
 
         setTimeout(() => {
-          this.iteration += 1;
-          el.style.opacity = '1';
-
           this.state.animating = false;
 
-          if (this.animationIterations) {
-            if (this.state.enter && this.animationIterations === this.iteration - 1) {
-              observer.unobserve(el);
-            }
-          } else if (this.state.enter && !this.options.infinite) {
-            observer.unobserve(el);
+          if (this.iteration >= this.animationIterations
+              && !this.options.infinite) {
+            if (this.onComplete) this.onComplete();
+            observer.unobserve(this.el);
+            this.showElement();
           }
         }, this.delay);
 
-        if (this.onEnter) {
-          this.onEnter();
-        }
+        if (this.onEnter) this.onEnter();
       } else {
         if (((this.animationIterations > 0 && !this.state.animating)
             || (this.options.infinite && !this.state.animating))
             || (!this.state.animating && !this.state.enter)) {
-          el.classList.remove(this.animationName);
-          el.style.animationDuration = '';
-          el.style.animationDelay = '';
-          el.style.opacity = '0';
+          this.hideElement();
         }
 
         // if (this.onExit

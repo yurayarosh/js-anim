@@ -151,7 +151,7 @@ function () {
 
     this.el = el;
     this.options = _objectSpread2({}, defaultParameters, {}, options);
-    this.iteration = 1;
+    this.iteration = 0;
     this.delay = 1000;
     this.state = {
       enter: false,
@@ -165,52 +165,68 @@ function () {
       this.animate();
     }
   }, {
+    key: "getAnimationOptions",
+    value: function getAnimationOptions() {
+      this.animationDuration = this.el.getAttribute('data-anim-duration') || '1s';
+      this.animationDelay = this.el.getAttribute('data-anim-delay') || '0s';
+      this.animationIterations = +this.el.getAttribute('data-anim-iterations') || 1;
+      this.animationTimingFunction = this.el.getAttribute('data-anim-ease') || 'ease';
+    }
+  }, {
+    key: "showElement",
+    value: function showElement() {
+      this.el.style.visibility = 'visible';
+      this.el.classList.add(this.animationName);
+      this.el.style.animationDuration = this.animationDuration;
+      this.el.style.animationDelay = this.animationDelay;
+      this.el.style.animationTimingFunction = this.animationTimingFunction;
+    }
+  }, {
+    key: "hideElement",
+    value: function hideElement() {
+      this.el.style.visibility = 'hidden';
+      this.el.classList.remove(this.animationName);
+      this.el.style.animationDuration = '';
+      this.el.style.animationDelay = '';
+      this.el.style.animationTimingFunction = '';
+    }
+  }, {
     key: "animateEls",
     value: function animateEls(entries, observer) {
       var _this = this;
 
       entries.forEach(function (entry) {
-        var el = entry.target;
-        _this.animationName = el.getAttribute('data-anim-name');
+        _this.animationName = _this.el.getAttribute('data-anim-name');
         if (!_this.animationName) return;
-        _this.animationDuration = el.getAttribute('data-anim-duration') || '1s';
-        _this.animationDelay = el.getAttribute('data-anim-delay') || '0s';
-        _this.animationIterations = +el.getAttribute('data-anim-iterations');
+
+        _this.getAnimationOptions();
 
         if (!_this.state.enter) {
-          el.style.opacity = '0';
+          _this.hideElement();
         }
 
         if (entry.isIntersecting && !_this.state.animating) {
           _this.state.enter = true;
           _this.state.animating = true;
-          el.classList.add(_this.animationName);
-          el.style.animationDuration = _this.animationDuration;
-          el.style.animationDelay = _this.animationDelay;
+          _this.iteration += 1;
+
+          _this.showElement();
+
           _this.delay = 1000 * (+_this.animationDuration.slice(0, -1) + +_this.animationDelay.slice(0, -1));
           setTimeout(function () {
-            _this.iteration += 1;
-            el.style.opacity = '1';
             _this.state.animating = false;
 
-            if (_this.animationIterations) {
-              if (_this.state.enter && _this.animationIterations === _this.iteration - 1) {
-                observer.unobserve(el);
-              }
-            } else if (_this.state.enter && !_this.options.infinite) {
-              observer.unobserve(el);
+            if (_this.iteration >= _this.animationIterations && !_this.options.infinite) {
+              if (_this.onComplete) _this.onComplete();
+              observer.unobserve(_this.el);
+
+              _this.showElement();
             }
           }, _this.delay);
-
-          if (_this.onEnter) {
-            _this.onEnter();
-          }
+          if (_this.onEnter) _this.onEnter();
         } else {
           if (_this.animationIterations > 0 && !_this.state.animating || _this.options.infinite && !_this.state.animating || !_this.state.animating && !_this.state.enter) {
-            el.classList.remove(_this.animationName);
-            el.style.animationDuration = '';
-            el.style.animationDelay = '';
-            el.style.opacity = '0';
+            _this.hideElement();
           } // if (this.onExit
           //   && this.state.enter
           //   // && !el.classList.contains(IS_ANIMATING)
@@ -257,6 +273,11 @@ function (_Anim) {
     key: "onEnter",
     value: function onEnter() {
       console.log(this, 'enter');
+    }
+  }, {
+    key: "onComplete",
+    value: function onComplete() {
+      console.log(this, 'complete');
     }
   }]);
 
