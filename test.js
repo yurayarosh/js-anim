@@ -152,7 +152,7 @@ function () {
     this.el = el;
     this.options = _objectSpread2({}, defaultParameters, {}, options);
     this.iteration = 0;
-    this.delay = 1000;
+    this.duration = 1000;
     this.state = {
       enter: false,
       animating: false
@@ -173,7 +173,6 @@ function () {
       this.el.style.visibility = 'visible';
       this.el.classList.add(this.animationName);
       this.el.style.animationDuration = this.animationDuration;
-      this.el.style.animationDelay = this.animationDelay;
       this.el.style.animationTimingFunction = this.animationTimingFunction;
     }
   }, {
@@ -182,7 +181,6 @@ function () {
       this.el.style.visibility = 'hidden';
       this.el.classList.remove(this.animationName);
       this.el.style.animationDuration = '';
-      this.el.style.animationDelay = '';
       this.el.style.animationTimingFunction = '';
     }
   }, {
@@ -204,10 +202,11 @@ function () {
           _this.state.enter = true;
           _this.state.animating = true;
           _this.iteration += 1;
-
-          _this.showElement();
-
-          _this.delay = 1000 * (+_this.animationDuration.slice(0, -1) + +_this.animationDelay.slice(0, -1));
+          _this.duration = 1000 * (+_this.animationDuration.slice(0, -1) + +_this.animationDelay.slice(0, -1));
+          _this.delay = 1000 * +_this.animationDelay.slice(0, -1);
+          setTimeout(function () {
+            _this.showElement();
+          }, _this.delay);
           setTimeout(function () {
             _this.state.animating = false;
 
@@ -217,7 +216,7 @@ function () {
 
               _this.showElement();
             }
-          }, _this.delay);
+          }, _this.duration);
           if (_this.onEnter) _this.onEnter();
         } else {
           if (_this.animationIterations > 0 && !_this.state.animating || _this.options.infinite && !_this.state.animating || !_this.state.animating && !_this.state.enter) {
@@ -237,7 +236,7 @@ function () {
           } else {
             setTimeout(function () {
               _this.state.enter = false;
-            }, _this.delay);
+            }, _this.duration);
           }
         }
       });

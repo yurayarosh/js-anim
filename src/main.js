@@ -8,7 +8,7 @@ export default class Anim {
     this.el = el;
     this.options = { ...defaultParameters, ...options };
     this.iteration = 0;
-    this.delay = 1000;
+    this.duration = 1000;
     this.state = {
       enter: false,
       animating: false,
@@ -26,7 +26,6 @@ export default class Anim {
     this.el.style.visibility = 'visible';
     this.el.classList.add(this.animationName);
     this.el.style.animationDuration = this.animationDuration;
-    this.el.style.animationDelay = this.animationDelay;
     this.el.style.animationTimingFunction = this.animationTimingFunction;
   }
 
@@ -34,7 +33,6 @@ export default class Anim {
     this.el.style.visibility = 'hidden';
     this.el.classList.remove(this.animationName);
     this.el.style.animationDuration = '';
-    this.el.style.animationDelay = '';
     this.el.style.animationTimingFunction = '';
   }
 
@@ -53,11 +51,14 @@ export default class Anim {
         this.state.animating = true;
         this.iteration += 1;
 
-        this.showElement()
-
-        this.delay = 1000
+        this.duration = 1000
          * ((+this.animationDuration.slice(0, -1))
           + (+this.animationDelay.slice(0, -1)));
+        this.delay = 1000 * (+this.animationDelay.slice(0, -1));        
+
+        setTimeout(() => {
+          this.showElement();
+        }, this.delay);        
 
         setTimeout(() => {
           this.state.animating = false;
@@ -68,7 +69,7 @@ export default class Anim {
             observer.unobserve(this.el);
             this.showElement();
           }
-        }, this.delay);
+        }, this.duration);
 
         if (this.onEnter) this.onEnter();
       } else {
@@ -92,7 +93,7 @@ export default class Anim {
         } else {
           setTimeout(() => {
             this.state.enter = false;
-          }, this.delay);
+          }, this.duration);
         }
       }
     });
