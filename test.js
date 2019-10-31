@@ -160,11 +160,6 @@ function () {
   }
 
   _createClass(Anim, [{
-    key: "init",
-    value: function init() {
-      this.animate();
-    }
-  }, {
     key: "getAnimationOptions",
     value: function getAnimationOptions() {
       this.animationDuration = this.el.getAttribute('data-anim-duration') || '1s';
@@ -248,10 +243,16 @@ function () {
       });
     }
   }, {
-    key: "animate",
-    value: function animate() {
+    key: "observe",
+    value: function observe() {
       this.observer = new IntersectionObserver(this.animateEls.bind(this), this.options.observer);
       this.observer.observe(this.el);
+    }
+  }, {
+    key: "unobserve",
+    value: function unobserve() {
+      this.observer.unobserve(this.el);
+      this.showElement();
     }
   }]);
 
@@ -289,5 +290,9 @@ var els = _toConsumableArray(document.querySelectorAll('.js-anim-el')); // if (!
 
 els.forEach(function (el) {
   var animator = new Animator(el);
-  animator.init();
+  animator.observe();
+  console.log(animator, 'init'); // setTimeout(() => {
+  //   animator.unobserve();
+  //   console.log(animator, 'destroy');
+  // }, 3000)
 });

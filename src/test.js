@@ -19,7 +19,16 @@ const els = [...document.querySelectorAll('.js-anim-el')];
 
   els.forEach((el) => {
     const animator = new Animator(el);
-    animator.init();    
+    animator.observe();
+    console.log(animator, 'init');
+    
+
+    // setTimeout(() => {
+    //   animator.unobserve();
+
+    //   console.log(animator, 'destroy');
+      
+    // }, 3000)
   });
 
 

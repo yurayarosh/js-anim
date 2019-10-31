@@ -20,7 +20,7 @@ if (!els.length) return;
 
 els.forEach((el) => {
   const animator = new Anim(el);
-  animator.init();    
+  animator.observe();
 });
 ```
 
@@ -34,7 +34,7 @@ Standart options
 }
 ```
 
-### Events
+### Methods
 
 ```js
 animator.onEnter = () => {
@@ -43,4 +43,5 @@ animator.onEnter = () => {
 animator.onComplete = () => {
   // some callback
 };
+animator.unobserve();
 ```

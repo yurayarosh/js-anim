@@ -15,10 +15,6 @@ export default class Anim {
     };
   }
 
-  init() {
-    this.animate();
-  }
-
   getAnimationOptions() {
     this.animationDuration = this.el.getAttribute('data-anim-duration') || '1s';
     this.animationDelay = this.el.getAttribute('data-anim-delay') || '0s';
@@ -102,8 +98,13 @@ export default class Anim {
     });
   }
 
-  animate() {
+  observe() {
     this.observer = new IntersectionObserver(this.animateEls.bind(this), this.options.observer);
     this.observer.observe(this.el);
+  }
+
+  unobserve() {
+    this.observer.unobserve(this.el);
+    this.showElement();
   }
 }
