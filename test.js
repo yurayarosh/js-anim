@@ -201,8 +201,8 @@ function () {
   _createClass(Animator, [{
     key: "getAnimationOptions",
     value: function getAnimationOptions() {
-      this.animationDuration = this.el.getAttribute('data-anim-duration') || '1s';
-      this.animationDelay = this.el.getAttribute('data-anim-delay') || '0s';
+      this.animationDuration = +this.el.getAttribute('data-anim-duration') || this.duration;
+      this.animationDelay = +this.el.getAttribute('data-anim-delay') || 0;
       this.animationIterations = +this.el.getAttribute('data-anim-iterations') || 1;
       this.animationTimingFunction = this.el.getAttribute('data-anim-ease') || 'ease';
     }
@@ -211,7 +211,7 @@ function () {
     value: function showElement() {
       this.el.style.visibility = 'visible';
       this.el.classList.add(this.animationName);
-      this.el.style.animationDuration = this.animationDuration;
+      this.el.style.animationDuration = "".concat(this.animationDuration, "ms");
 
       if (this.animationTimingFunction !== 'ease') {
         this.el.style.animationTimingFunction = this.animationTimingFunction;
@@ -260,8 +260,8 @@ function () {
           animator.state.enter = true;
           animator.state.animating = true;
           animator.iteration += 1;
-          animator.duration = 1000 * (+animator.animationDuration.slice(0, -1) + +animator.animationDelay.slice(0, -1));
-          animator.delay = 1000 * +animator.animationDelay.slice(0, -1);
+          animator.duration = animator.animationDuration + animator.animationDelay;
+          animator.delay = animator.animationDelay;
           setTimeout(function () {
             animator.showElement();
           }, animator.delay);
@@ -269,10 +269,10 @@ function () {
             animator.state.animating = false;
 
             if (animator.iteration >= animator.animationIterations && !animator.options.infinite) {
-              if (_this.onComplete) _this.onComplete(animator);
               observer.unobserve(animator.el);
               animator.showElement();
               animator.state.unobserved = true;
+              if (_this.onComplete) _this.onComplete(animator);
             }
           }, animator.duration);
           if (_this.onEnter) _this.onEnter(animator);
@@ -305,7 +305,7 @@ function () {
   function Anim(els, options) {
     _classCallCheck(this, Anim);
 
-    this.els = els;
+    this.els = _toConsumableArray(els);
     this.options = _objectSpread2({}, defaultParameters, {}, options);
     this.animate = Animator.animateEls;
     this.animators = [];
@@ -363,11 +363,13 @@ function (_Anim) {
   return Animator;
 }(Anim);
 
-var els = _toConsumableArray(document.querySelectorAll('.js-anim-el')); // if (!els.length) return;
+var els = document.querySelectorAll('.js-anim-el'); // if (!els.length) return;
 // els.forEach((el) => {
 
-
-var animator = new Animator$1(els);
+var animator = new Animator$1(els, {
+  observer: {// threshold: 0.5
+  }
+});
 animator.observe(); // console.log(animator, 'init');
 // setTimeout(() => {
 //   animator.unobserve();

@@ -7,7 +7,7 @@ npm i js-anim
 ```
 
 ```html
-<div class="box js-anim-el" data-anim-name="slideRight" data-anim-iterations="4" data-anim-delay="1s" data-anim-ease="cubic-bezier(0.19, 1, 0.22, 1)">
+<div class="box js-anim-el" data-anim-name="slideRight" data-anim-iterations="4" data-anim-delay="200" data-anim-duration="750" data-anim-ease="cubic-bezier(0.19, 1, 0.22, 1)">
     
 </div>
 ```
@@ -15,10 +15,9 @@ npm i js-anim
 ```js
 import Anim from 'js-anim'
 
-const els = [...document.querySelectorAll('.js-anim-el')];
-if (!els.length) return;
+const els = document.querySelectorAll('.js-anim-el');
 
-const anim = new Anim(el);
+const anim = new Anim(els);
 anim.observe();
 ```
 

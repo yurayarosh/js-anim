@@ -17,8 +17,8 @@ class Animator {
   }
 
   getAnimationOptions() {
-    this.animationDuration = this.el.getAttribute('data-anim-duration') || '1s';
-    this.animationDelay = this.el.getAttribute('data-anim-delay') || '0s';
+    this.animationDuration = +this.el.getAttribute('data-anim-duration') || this.duration;
+    this.animationDelay = +this.el.getAttribute('data-anim-delay') || 0;
     this.animationIterations = +this.el.getAttribute('data-anim-iterations') || 1;
     this.animationTimingFunction = this.el.getAttribute('data-anim-ease') || 'ease';
   }
@@ -26,7 +26,7 @@ class Animator {
   showElement() {
     this.el.style.visibility = 'visible';
     this.el.classList.add(this.animationName);
-    this.el.style.animationDuration = this.animationDuration;
+    this.el.style.animationDuration = `${this.animationDuration}ms`;
     if (this.animationTimingFunction !== 'ease') {
       this.el.style.animationTimingFunction = this.animationTimingFunction;
     }
@@ -43,7 +43,7 @@ class Animator {
     entries.forEach((entry, i) => {
       const el = entry.target;
       let animator;
-      if (this.animators.length < entries.length) {
+      if (this.animators.length < entries.length) {        
         animator = new Animator(el, this.options);
         this.animators.push(animator);
       } else {
@@ -63,10 +63,8 @@ class Animator {
         animator.state.animating = true;
         animator.iteration += 1;        
 
-        animator.duration = 1000
-         * ((+animator.animationDuration.slice(0, -1))
-          + (+animator.animationDelay.slice(0, -1)));
-          animator.delay = 1000 * (+animator.animationDelay.slice(0, -1));
+        animator.duration = animator.animationDuration + animator.animationDelay;
+        animator.delay = animator.animationDelay;
 
         setTimeout(() => {
           animator.showElement();
@@ -76,11 +74,11 @@ class Animator {
           animator.state.animating = false;
 
           if (animator.iteration >= animator.animationIterations
-              && !animator.options.infinite) {
-            if (this.onComplete) this.onComplete(animator);
+              && !animator.options.infinite) {            
             observer.unobserve(animator.el);
             animator.showElement();
             animator.state.unobserved = true;
+            if (this.onComplete) this.onComplete(animator);
           }
         }, animator.duration);
 
@@ -109,7 +107,7 @@ class Animator {
 
 export default class Anim {
   constructor(els, options) {
-    this.els = els;
+    this.els = [...els];
     this.options = { ...defaultParameters, ...options };
     this.animate = Animator.animateEls;
     this.animators = [];
@@ -119,8 +117,8 @@ export default class Anim {
     if(!this.els.length) return;
 
     this.observer = new IntersectionObserver(this.animate.bind(this), this.options.observer);
-
-    this.els.forEach(el => {
+    
+    this.els.forEach(el => {      
       this.observer.observe(el);
     });
   }

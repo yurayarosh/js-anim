@@ -14,11 +14,15 @@ class Animator extends Anim {
   // }
 }
 
-const els = [...document.querySelectorAll('.js-anim-el')];
+const els = document.querySelectorAll('.js-anim-el');
   // if (!els.length) return;
 
   // els.forEach((el) => {
-    const animator = new Animator(els);
+    const animator = new Animator(els, {
+      observer: {
+        // threshold: 0.5
+      }
+    });
     animator.observe();
     
     // console.log(animator, 'init');
