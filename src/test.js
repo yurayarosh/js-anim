@@ -6,7 +6,7 @@ class Animator extends Anim {
   }
 
   onEnter(animator) {
-    console.log(this, animator, 'enter');
+    // console.log(this, animator, 'enter');
   }
 
   // onComplete(animator) {
@@ -20,8 +20,9 @@ const els = document.querySelectorAll('.js-anim-el');
   // els.forEach((el) => {
     const animator = new Animator(els, {
       observer: {
-        // threshold: 0.5
-      }
+        // threshold: [0, 0.2, 1]
+      },
+      infinite: true
     });
     animator.observe();
     

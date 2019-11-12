@@ -10,7 +10,8 @@
     }
 
     .box {
-      margin-top: 150vh;
+      margin: 0 auto;
+      margin-bottom: 100vh;
       width: 500px;
       height: 500px;
       background-color: orange;
@@ -19,21 +20,38 @@
     .slideRight {
       animation-name: slideRight;
     }
+    .fadeInUp {
+      animation-name: fadeInUp;
+      animation-timing-function: cubic-bezier(.16,1.08,.38,.98);
+    }
 
     @keyframes slideRight {
       from { transform: translate(-100%, 0); }
       to { transform: translate(0, 0) }
+    }
+    @keyframes fadeInUp {
+      from {
+        transform: translate(0, 100%) scaleY(2);
       }
+
+      to {
+        transform: translate(0, 0) scaleY(1);
+      }
+    }
 
   </style>
 </head>
 <body>  
 
-  <div class="box js-anim-el" data-anim-name="slideRight" data-anim-iterations="4"  data-anim-ease="cubic-bezier(0.19, 1, 0.22, 1)" data-anim-duration="5000" data-anim-delay="300">
+  <div class="box js-anim-el" data-anim-name="slideRight" data-anim-iterations="4">
     hello
   </div>
 
   <div class="box box-2 js-anim-el" data-anim-name="slideRight" data-anim-iterations="1" data-anim-ease="cubic-bezier(0.19, 1, 0.22, 1)">
+    hello
+  </div>
+
+  <div class="box box-2 js-anim-el" data-anim-name="fadeInUp">
     hello
   </div>
   

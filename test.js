@@ -194,7 +194,8 @@ function () {
     this.state = {
       enter: false,
       animating: false,
-      unobserved: false
+      unobserved: false,
+      triggerPoint: 0
     };
   }
 
@@ -230,7 +231,7 @@ function () {
     value: function animateEls(entries, observer) {
       var _this = this;
 
-      entries.forEach(function (entry, i) {
+      entries.forEach(function (entry) {
         var el = entry.target;
         var animator;
 
@@ -256,7 +257,9 @@ function () {
           animator.hideElement();
         }
 
-        if (entry.isIntersecting && !animator.state.animating) {
+        animator.state.triggerPoint = _this.observer.thresholds.length === 3 ? _this.observer.thresholds[1] : _this.observer.thresholds[0];
+
+        if (entry.isIntersecting && !animator.state.animating && !animator.state.enter && entry.intersectionRatio >= animator.state.triggerPoint) {
           animator.state.enter = true;
           animator.state.animating = true;
           animator.iteration += 1;
@@ -278,18 +281,10 @@ function () {
           if (_this.onEnter) _this.onEnter(animator);
         } else {
           if (animator.animationIterations > 0 && !animator.state.animating || animator.options.infinite && !animator.state.animating || !animator.state.animating && !animator.state.enter) {
-            animator.hideElement();
-          }
-
-          if (animator.options.infinite) {
-            animator.state.enter = false;
-          } else if (!animator.state.animating) {
-            animator.state.enter = false;
-          } else {
-            setTimeout(function () {
+            if (entry.intersectionRatio <= 0) {
               animator.state.enter = false;
-              if (!animator.state.unobserved) animator.hideElement();
-            }, animator.duration);
+              animator.hideElement();
+            }
           }
         }
       });
@@ -352,9 +347,8 @@ function (_Anim) {
 
   _createClass(Animator, [{
     key: "onEnter",
-    value: function onEnter(animator) {
-      console.log(this, animator, 'enter');
-    } // onComplete(animator) {
+    value: function onEnter(animator) {} // console.log(this, animator, 'enter');
+    // onComplete(animator) {
     //   console.log(animator, 'complete');
     // }
 
@@ -367,8 +361,9 @@ var els = document.querySelectorAll('.js-anim-el'); // if (!els.length) return;
 // els.forEach((el) => {
 
 var animator = new Animator$1(els, {
-  observer: {// threshold: 0.5
-  }
+  observer: {// threshold: [0, 0.2, 1]
+  },
+  infinite: true
 });
 animator.observe(); // console.log(animator, 'init');
 // setTimeout(() => {

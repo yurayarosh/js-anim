@@ -12,7 +12,8 @@ class Animator {
     this.state = {
       enter: false,
       animating: false,
-      unobserved: false
+      unobserved: false,
+      triggerPoint: 0
     };
   }
 
@@ -40,10 +41,10 @@ class Animator {
   }
 
   static animateEls(entries, observer) {
-    entries.forEach((entry, i) => {
+    entries.forEach((entry) => {
       const el = entry.target;
       let animator;
-      if (this.animators.length < entries.length) {        
+      if (this.animators.length < entries.length) {
         animator = new Animator(el, this.options);
         this.animators.push(animator);
       } else {
@@ -58,13 +59,20 @@ class Animator {
         animator.hideElement();
       }
 
-      if (entry.isIntersecting && !animator.state.animating) {
+      animator.state.triggerPoint = this.observer.thresholds.length === 3
+        ? this.observer.thresholds[1]
+        : this.observer.thresholds[0]
+      
+      if (entry.isIntersecting
+          && !animator.state.animating
+          && !animator.state.enter
+          && entry.intersectionRatio >= animator.state.triggerPoint) {
         animator.state.enter = true;
         animator.state.animating = true;
-        animator.iteration += 1;        
+        animator.iteration += 1;
 
         animator.duration = animator.animationDuration + animator.animationDelay;
-        animator.delay = animator.animationDelay;
+        animator.delay = animator.animationDelay;        
 
         setTimeout(() => {
           animator.showElement();
@@ -74,7 +82,7 @@ class Animator {
           animator.state.animating = false;
 
           if (animator.iteration >= animator.animationIterations
-              && !animator.options.infinite) {            
+              && !animator.options.infinite) {
             observer.unobserve(animator.el);
             animator.showElement();
             animator.state.unobserved = true;
@@ -83,22 +91,15 @@ class Animator {
         }, animator.duration);
 
         if (this.onEnter) this.onEnter(animator);
-      } else {
+      } else {        
         if (((animator.animationIterations > 0 && !animator.state.animating)
             || (animator.options.infinite && !animator.state.animating))
-            || (!animator.state.animating && !animator.state.enter)) {
-              animator.hideElement();
-        }
-
-        if (animator.options.infinite) {
-          animator.state.enter = false;
-        } else if (!animator.state.animating) {
-          animator.state.enter = false;
-        } else {
-          setTimeout(() => {
-            animator.state.enter = false;
-            if(!animator.state.unobserved) animator.hideElement();
-          }, animator.duration);
+            || (!animator.state.animating && !animator.state.enter)) {              
+              
+              if(entry.intersectionRatio <= 0) {
+                animator.state.enter = false;
+                animator.hideElement();
+              }
         }
       }
     });
