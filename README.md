@@ -1,5 +1,9 @@
 # js-anim
 
+### Example
+
+  * [Codesandbox](https://codesandbox.io/s/js-anim-example-nxk4e)
+
 ### Install
 
 ```html
