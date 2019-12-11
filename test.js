@@ -265,10 +265,11 @@ function () {
           animator.iteration += 1;
           animator.duration = animator.animationDuration + animator.animationDelay;
           animator.delay = animator.animationDelay;
-          setTimeout(function () {
+          var timeoutShow = window.setTimeout(function () {
             animator.showElement();
+            window.clearTimeout(timeoutShow);
           }, animator.delay);
-          setTimeout(function () {
+          var timeoutCallback = window.setTimeout(function () {
             animator.state.animating = false;
 
             if (animator.iteration >= animator.animationIterations && !animator.options.infinite) {
@@ -277,6 +278,8 @@ function () {
               animator.state.unobserved = true;
               if (_this.onComplete) _this.onComplete(animator);
             }
+
+            window.clearTimeout(timeoutCallback);
           }, animator.duration);
           if (_this.onEnter) _this.onEnter(animator);
         } else {

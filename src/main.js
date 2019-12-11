@@ -41,7 +41,7 @@ class Animator {
   }
 
   static animateEls(entries, observer) {
-    entries.forEach((entry) => {
+    entries.forEach(entry => {
       const el = entry.target;
       let animator;
       if (this.animators.length < entries.length) {
@@ -49,8 +49,8 @@ class Animator {
         this.animators.push(animator);
       } else {
         [animator] = this.animators.filter(obj => obj.el === el);
-      }      
-      
+      }
+
       animator.animationName = el.getAttribute('data-anim-name');
       if (!animator.animationName) return;
       animator.getAnimationOptions();
@@ -62,44 +62,46 @@ class Animator {
       animator.state.triggerPoint = this.observer.thresholds.length === 3
         ? this.observer.thresholds[1]
         : this.observer.thresholds[0]
-      
+
       if (entry.isIntersecting
-          && !animator.state.animating
-          && !animator.state.enter
-          && entry.intersectionRatio >= animator.state.triggerPoint) {
+        && !animator.state.animating
+        && !animator.state.enter
+        && entry.intersectionRatio >= animator.state.triggerPoint) {
         animator.state.enter = true;
         animator.state.animating = true;
         animator.iteration += 1;
 
         animator.duration = animator.animationDuration + animator.animationDelay;
-        animator.delay = animator.animationDelay;        
+        animator.delay = animator.animationDelay;
 
-        setTimeout(() => {
+        const timeoutShow = window.setTimeout(() => {
           animator.showElement();
+          window.clearTimeout(timeoutShow);
         }, animator.delay);
 
-        setTimeout(() => {
+        const timeoutCallback = window.setTimeout(() => {
           animator.state.animating = false;
 
           if (animator.iteration >= animator.animationIterations
-              && !animator.options.infinite) {
+            && !animator.options.infinite) {
             observer.unobserve(animator.el);
             animator.showElement();
             animator.state.unobserved = true;
             if (this.onComplete) this.onComplete(animator);
           }
+          window.clearTimeout(timeoutCallback);
         }, animator.duration);
 
         if (this.onEnter) this.onEnter(animator);
-      } else {        
+      } else {
         if (((animator.animationIterations > 0 && !animator.state.animating)
-            || (animator.options.infinite && !animator.state.animating))
-            || (!animator.state.animating && !animator.state.enter)) {              
-              
-              if(entry.intersectionRatio <= 0) {
-                animator.state.enter = false;
-                animator.hideElement();
-              }
+          || (animator.options.infinite && !animator.state.animating))
+          || (!animator.state.animating && !animator.state.enter)) {
+
+          if (entry.intersectionRatio <= 0) {
+            animator.state.enter = false;
+            animator.hideElement();
+          }
         }
       }
     });
@@ -115,11 +117,11 @@ export default class Anim {
   }
 
   observe() {
-    if(!this.els.length) return;
+    if (!this.els.length) return;
 
     this.observer = new IntersectionObserver(this.animate.bind(this), this.options.observer);
-    
-    this.els.forEach(el => {      
+
+    this.els.forEach(el => {
       this.observer.observe(el);
     });
   }
@@ -127,7 +129,7 @@ export default class Anim {
   unobserve() {
     this.els.forEach((el, i) => {
       this.observer.unobserve(el);
-      if(this.animators.length > 0) this.animators[i].showElement();
+      if (this.animators.length > 0) this.animators[i].showElement();
     });
 
     this.animators = [];
